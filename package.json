@@ -7,7 +7,7 @@
     "admin": "cd adm* & npm run serve",
     "cli": "cd cli* & npm run serve",
     "ser": "nodemon index.js",
-    "start": "node server/index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "main": "index.js",
