@@ -4,7 +4,7 @@ const mongodb = require('mongodb'),
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
 const router = express.Router();
-
+var lQ
 
   
 multer = require('multer'),
@@ -124,11 +124,20 @@ router.get('/feed', function (req, res) {
         })
       }
     })
-  }
- 
-  
-  
+  }  
 })
+router.get('/feed2', function (req, res) {  
+  var fquery = '_id questname questdetail duedate image'
+
+    Quest.find({ status: "waiting"})
+    .select(fquery)
+    .sort({rdate:-1})
+    .then(quest => {   
+      console.log('------------------------------------------')
+      res.send({ quest: quest, success: true,questnum:quest.length})
+    })
+  }  
+)
 
 router.post('/',  passport.authenticate('pass', {
   session: false
