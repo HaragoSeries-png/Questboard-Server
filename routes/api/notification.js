@@ -12,8 +12,9 @@ router.get('/',passport.authenticate('pass', {
     console.log('noti')
     let user = req.user
     let force = req.query.force
-    console.log(force)
-    if(user.unreadnoti.length||force){
+    let boo = user.unreadnoti.length||force
+    console.log(boo)
+    if(boo=='true'){
         console.log('have notiiiiiiiiiiiiiiiiii')       
         user.notify.push.apply(user.notify,user.unreadnoti)
         user.unreadnoti =[]
@@ -22,7 +23,7 @@ router.get('/',passport.authenticate('pass', {
         user.save()
         res.send({sucess:true,notify})
     }
-    else{
+    else if(boo='false'){
         console.log('kalm\n---------')
         res.send({sucess:false})
     }       
