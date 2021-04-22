@@ -15,7 +15,7 @@ router.put('/decide', function (req, res) {
           quest.status = 'waiting'
           quest.rate = req.body.rate
           User.findById(quest.helperID).then(user=>{
-            let noti = {message:"Approve",quest:{quest_id:questid,questname:quest.questname}}
+            let noti = {message:"Approve",quest:{quest_id:questid,questname:quest.questname},date:Date.now()}
             user.notify.push(noti)
             user.havenoti = true
             user.save()
