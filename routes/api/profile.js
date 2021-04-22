@@ -37,7 +37,7 @@ const router = express.Router();
 router.get('/id/:id', passport.authenticate('pass', {
     session: false
 }), (req, res) => {
-    User.findById(req.params.id, function(err, user){
+    User.findById(req.params.id).select('username email joinDate infoma rating').then(function(err, user){
         res.send({ success: true, user: user })
     });
 });

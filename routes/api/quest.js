@@ -17,8 +17,8 @@ Qc.on('change',change=> {
 
   
 multer = require('multer'),
-  bodyParser = require('body-parser'),
-  dateFormat = require("dateformat");
+bodyParser = require('body-parser'),
+dateFormat = require("dateformat");
 
 
 const storage = multer.diskStorage({
