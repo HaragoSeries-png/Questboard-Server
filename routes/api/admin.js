@@ -19,6 +19,7 @@ router.put('/decide', function (req, res) {
             user.notify.push(noti)
             user.havenoti = true
             user.save()
+            
           })
         }
         else {

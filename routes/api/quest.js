@@ -1,10 +1,19 @@
+const { json } = require('body-parser');
 const express = require('express');
 const mongodb = require('mongodb'),
   passport = require('passport');
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
 const router = express.Router();
-var lQ
+var Ql
+const Qc = Quest.watch()
+Qc.on('change',change=> { 
+  let ql = (Math.floor(Date.now() / 1000))
+  console.log('q'+ql)
+  Ql =  ql
+})
+
+
 
   
 multer = require('multer'),
@@ -50,94 +59,97 @@ router.get('/questid/:id', function (req, res) {
   })
 })
 
-router.get('/feed', function (req, res) {
-  let page = Math.max(0, req.query.page)
-  let perPage = 12
-  let cat = req.query.cat
-  var count =0
-  var numall  =0
-  var fquery = '_id questname questdetail duedate image'
-  console.log('count pre  '+count)
-  if(cat){
-    Quest.find({ status: "waiting",category:cat})
-    .select(fquery)
-    .then(async quest => {
-      numall = quest.length
-      count = await Math.ceil(numall/perPage)
-      console.log('count cat '+count)
-    })
-    .then(async q=>{
-      if(cat){   
-        Quest.find({ status: "waiting",category:cat})
-        .select(fquery)
-        .limit(perPage)
-        .skip(perPage*page)
-        .sort({rdate:-1})
-        .then(quest => {
+// router.get('/feed', function (req, res) {
+//   let page = Math.max(0, req.query.page)
+//   let perPage = 12
+//   let cat = req.query.cat
+//   var count =0
+//   var numall  =0
+//   var fquery = '_id questname questdetail duedate image'
+//   console.log('count pre  '+count)
+//   if(cat){
+//     Quest.find({ status: "waiting",category:cat})
+//     .select(fquery)
+//     .then(async quest => {
+//       numall = quest.length
+//       count = await Math.ceil(numall/perPage)
+//       console.log('count cat '+count)
+//     })
+//     .then(async q=>{
+//       if(cat){   
+//         Quest.find({ status: "waiting",category:cat})
+//         .select(fquery)
+//         .limit(perPage)
+//         .skip(perPage*page)
+//         .sort({rdate:-1})
+//         .then(quest => {
           
-          res.send({ quest: quest, success: true,pagenum:count })
-        })
-      }
-      else{  
-        Quest.find({ status: "waiting"})
-        .select(fquery)
-        .limit(perPage)
-        .skip(perPage*page)
-        .sort({rdate:-1})
-        .then(quest => {   
-          console.log('cou '+count)
-          console.log('------------------------------------------')
-          res.send({ quest: quest, success: true,pagenum:count })
-        })
-      }
-    })
-  }
-  else{
-    Quest.find({ status: "waiting"})
-    .then(async quest => {
-      numall = quest.length
-      count = await Math.ceil(numall/perPage)
-      console.log('count nocat '+count)
-    })
-    .then(q=>{
-      if(cat){   
-        Quest.find({ status: "waiting",category:cat})
-        .select(fquery)
-        .limit(perPage)
-        .skip(perPage*page)
-        .sort({rdate:-1})
-        .then(quest => {
+//           res.send({ quest: quest, success: true,pagenum:count })
+//         })
+//       }
+//       else{  
+//         Quest.find({ status: "waiting"})
+//         .select(fquery)
+//         .limit(perPage)
+//         .skip(perPage*page)
+//         .sort({rdate:-1})
+//         .then(quest => {   
+//           console.log('cou '+count)
+//           console.log('------------------------------------------')
+//           res.send({ quest: quest, success: true,pagenum:count })
+//         })
+//       }
+//     })
+//   }
+//   else{
+//     Quest.find({ status: "waiting"})
+//     .then(async quest => {
+//       numall = quest.length
+//       count = await Math.ceil(numall/perPage)
+//       console.log('count nocat '+count)
+//     })
+//     .then(q=>{
+//       if(cat){   
+//         Quest.find({ status: "waiting",category:cat})
+//         .select(fquery)
+//         .limit(perPage)
+//         .skip(perPage*page)
+//         .sort({rdate:-1})
+//         .then(quest => {
           
-          res.send({ quest: quest, success: true,pagenum:count })
-        })
-      }
-      else{  
-        Quest.find({ status: "waiting"})
-        .select(fquery)
-        .limit(perPage)
-        .skip(perPage*page)
-        .sort({rdate:-1})
-        .then(quest => {   
-          console.log('cou '+count)
-          console.log('------------------------------------------')
-          res.send({ quest: quest, success: true,pagenum:count })
-        })
-      }
-    })
-  }  
-})
-router.get('/feed2', function (req, res) {  
+//           res.send({ quest: quest, success: true,pagenum:count })
+//         })
+//       }
+//       else{  
+//         Quest.find({ status: "waiting"})
+//         .select(fquery)
+//         .limit(perPage)
+//         .skip(perPage*page)
+//         .sort({rdate:-1})
+//         .then(quest => {   
+//           console.log('cou '+count)
+//           console.log('------------------------------------------')
+//           res.send({ quest: quest, success: true,pagenum:count })
+//         })
+//       }
+//     })
+//   }  
+// })
+router.get('/feed', function (req, res) {  
   var fquery = '_id questname questdetail duedate image'
 
     Quest.find({ status: "waiting"})
     .select(fquery)
     .sort({rdate:-1})
     .then(quest => {   
+      console.log(quest.createdAt)
+      console.log(quest.updatedAt)
       console.log('------------------------------------------')
       res.send({ quest: quest, success: true,questnum:quest.length})
     })
   }  
 )
+
 
 router.post('/',  passport.authenticate('pass', {
   session: false
@@ -241,7 +253,8 @@ router.get('/test', function (req, res) {
   //   console.log(remain)
   //   return res.send({ remain: remain })
   // })
-  let d = 'time '+ dateFormat(Date.now(), "longDate")
+  let d =Ql+' d'
+  console.log('d '+d)
   return res.send(d) 
 })
 

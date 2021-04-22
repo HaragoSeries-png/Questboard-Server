@@ -29,8 +29,9 @@ let QuestSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
     }],
-    numberofcon:Number
-})
+    numberofcon:Number,
+
+},{ timestamps: true })
 
 QuestSchema.methods.remain = async function(){
     console.log("numcon "+this.numberofcon)
