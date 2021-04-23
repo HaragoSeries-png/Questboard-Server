@@ -11,7 +11,7 @@ const mongodb = require('mongodb'),
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'server/public')
+        cb(null, './public')
     },
     filename: function (req, file, cb) {
         cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
@@ -69,11 +69,12 @@ router.put('/editPro', passport.authenticate('pass', {
 router.put('/editPic',  passport.authenticate('pass', {
     session: false
 }),upload.single('image'), (req, res) => {
+    console.log('/editpic')
     console.log(req.user.infoma.proimage)
     try{
         req.user.infoma.proimage = req.file.filename
         if(req.user.infoma.proimage != ""){
-            fs.unlinkSync('server/public/'+ req.user.infoma.proimage)
+            fs.unlinkSync('@/public/'+ req.user.infoma.proimage)
         }
     }
     catch{
