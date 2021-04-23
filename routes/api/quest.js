@@ -136,7 +136,7 @@ router.get('/questid/:id', function (req, res) {
 //   }  
 // })
 router.get('/feed', function (req, res) {  
-  var fquery = '_id questname questdetail duedate image'
+  var fquery = '_id questname questdetail duedate image category'
 
     Quest.find({ status: "waiting"})
     .select(fquery)
