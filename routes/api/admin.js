@@ -21,8 +21,8 @@ router.put('/decide', function (req, res) {
             user.havenoti = true
             user.save()
             quest.save()
-          console.log(quest.status)
-          return res.send({success:true,noti:user.unreadnoti})
+            console.log(quest.status)
+            return res.send({success:true,noti:user.unreadnoti})
           })
         }
         else {
