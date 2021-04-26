@@ -17,10 +17,12 @@ router.put('/decide', function (req, res) {
           User.findById(quest.helperID).then(user=>{
             let noti = {message:"Approve",quest:{quest_id:questid,questname:quest.questname},date:Date.now()}
             console.log(noti)
-            user.notify.push(noti)
+            user.unreadnoti.push(noti)
             user.havenoti = true
             user.save()
-            
+            quest.save()
+          console.log(quest.status)
+          return res.send({success:true,noti:user.unreadnoti})
           })
         }
         else {
@@ -28,14 +30,15 @@ router.put('/decide', function (req, res) {
           User.findById(quest.helperID).then(user=>{
             let noti = {message:"reject",quest:{quest_id:questid,questname:quest.questname}}
             console.log(noti)
-            user.notify.push(noti)
+            user.unreadnoti.push(noti)
             user.havenoti = true
             user.save()
+            quest.save()
+            console.log(quest.status)
+            return res.send({success:true,noti:user.unreadnoti})
           })       
         }
-        quest.save()
-        console.log(quest.status)
-        return res.send({success:true})
+        
       })
     } catch (error) {
       return res.send({success:false})
