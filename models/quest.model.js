@@ -34,10 +34,10 @@ let QuestSchema = new mongoose.Schema({
 },{ timestamps: true })
 
 QuestSchema.methods.remain = async function(){
-    console.log("numcon "+this.numberofcon)
-    console.log("this.contributor.length "+this.contributor.length)
+    // console.log("numcon "+this.numberofcon)
+    // console.log("this.contributor.length "+this.contributor.length)
     let remain = this.numberofcon-this.contributor.length
-    console.log(remain)
+    // console.log(remain)
     return remain
 }
 QuestSchema.methods.cNametoString= function(){
@@ -46,7 +46,7 @@ QuestSchema.methods.cNametoString= function(){
         console.log('ci '+ typeof ci)
         let cname = User.findById(ci).then((u)=>{
             let data = {id:u._id,name:u.infoma.firstname}
-            console.log('data : '+JSON.stringify(data) )
+            // console.log('data : '+JSON.stringify(data) )
             return data
         })
        
