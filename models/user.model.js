@@ -64,7 +64,7 @@ let UserSchema = new mongoose.Schema({
             quest_id:String,
             questname:String
         } 
-        ,date:Date.now()    
+        ,date:Date 
     }],
     unreadnoti:[{
         message:String,
@@ -72,7 +72,7 @@ let UserSchema = new mongoose.Schema({
             quest_id:String,
             questname:String
         }  
-        ,date:Date.now()      
+        ,date:Date    
     }],
     havenoti:Boolean,
     token:[String]
