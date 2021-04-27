@@ -15,7 +15,7 @@ router.put('/decide', function (req, res) {
           quest.status = 'waiting'
           quest.rate = req.body.rate
           User.findById(quest.helperID).then(user=>{
-            let noti = {message:"Approve",quest:{quest_id:questid,questname:quest.questname},date:Date.now()}
+            let noti = {message:"Approve",quest_id:questid,questname:quest.questname,date:Date.now()}
             console.log(noti)
             user.unreadnoti.push(noti)
             user.havenoti = true
@@ -28,7 +28,7 @@ router.put('/decide', function (req, res) {
         else {
           quest.status = 'reject'       
           User.findById(quest.helperID).then(user=>{
-            let noti = {message:"reject",quest:{quest_id:questid,questname:quest.questname}}
+            let noti = {message:"reject",quest_id:questid,questname:quest.questname,date:Date.now()}
             console.log(noti)
             user.unreadnoti.push(noti)
             user.havenoti = true

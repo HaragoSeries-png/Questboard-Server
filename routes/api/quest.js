@@ -5,6 +5,9 @@ const mongodb = require('mongodb'),
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
 const router = express.Router();
+var fs = require('fs');
+
+var cloudinary = require('cloudinary');
 var Ql
 const Qc = Quest.watch()
 Qc.on('change',change=> { 
@@ -12,6 +15,12 @@ Qc.on('change',change=> {
   console.log('q'+ql)
   Ql =  ql
 })
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME, 
+  api_key: process.env.CLOUD_KEY,
+  api_secret: process.env.CLOUD_SECRET
+});
 
 
 
@@ -292,6 +301,20 @@ router.put('/start',function(req,res){
     res.send({success:true})
   })
 })
-
+router.get('/pp', function(req, res) {
+  res.send('<form method="post" enctype="multipart/form-data">'
+    + '<p>Public ID: <input type="text" name="title"/></p>'
+    + '<p>Image: <input type="file" name="image"/></p>'
+    + '<p><input type="submit" value="Upload"/></p>'
+    + '</form>');
+});
+router.post('/pp', function(req, res, next) {
+  stream = cloudinary.uploader.upload_stream(function(result) {
+    console.log("result "+result);
+    res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
+             cloudinary.image(result.public_id, { format: "png", width: 100, height: 130, crop: "fill" }));
+  }, { public_id: req.body.title } );
+  fs.createReadStream(req.files.image.path, {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
+});
 
 module.exports = router;

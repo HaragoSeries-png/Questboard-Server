@@ -59,20 +59,15 @@ let UserSchema = new mongoose.Schema({
     },
     notify:[{
         message:String,
-        time: Date,
-        quest:{
-            quest_id:String,
-            questname:String
-        } 
-        ,date:Date 
+        quest_id:String,
+        questname:String,
+        date:Date 
     }],
     unreadnoti:[{
         message:String,
-        quest:{
-            quest_id:String,
-            questname:String
-        }  
-        ,date:Date    
+        quest_id:String,
+        questname:String,
+        date:Date    
     }],
     havenoti:Boolean,
     token:[String]

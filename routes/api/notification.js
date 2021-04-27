@@ -11,19 +11,27 @@ router.get('/',passport.authenticate('pass', {
 }),async function(req,res){
     console.log('noti')
     let user = req.user
-    let force = req.query.force
-    let boo = user.unreadnoti.length||force
-    console.log(boo)
-    if(boo=='true'){
+    let force = false
+    let tem=false;
+    console.log('cc '+((user.unreadnoti.length>0)||force))
+    if(((user.unreadnoti.length>0))){        
+        tem=true
+    }
+    if(req.query.force=='true'){
+        force = true
+    }
+    let cal = Boolean(tem||force)
+    if(cal===true){
         console.log('have notiiiiiiiiiiiiiiiiii')       
         user.notify.push.apply(user.notify,user.unreadnoti)
         user.unreadnoti =[]
         let notify = user.notify
+        console.log(notify)
         user.havenoti = false
         user.save()
         res.send({sucess:true,notify})
     }
-    else if(boo='false'){
+    else {
         console.log('kalm\n---------')
         res.send({sucess:false})
     }       
