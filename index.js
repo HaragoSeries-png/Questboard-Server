@@ -8,6 +8,7 @@ const express = require('express'),
     passportLocal = require('passport-local'),
     User = require('./models/user.model'),
     methodOverride = require("method-override"),
+    fileUpload = require('express-fileupload'),
      path = require('path');
     
 const app = express();
@@ -17,7 +18,7 @@ app.use(require('express-session')({
     resave: false,
     saveUninitialized: false
 }));
-
+// app.use(fileUpload())
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride("_method"));

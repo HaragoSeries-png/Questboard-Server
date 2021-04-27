@@ -7,8 +7,13 @@ const mongodb = require('mongodb'),
       User = require('../../models/user.model'),
       multer = require('multer'),
       fs = require('fs')
-      bodyParser = require('body-parser').json();
-
+      bodyParser = require('body-parser').json(),
+      cloudinary = require('cloudinary');
+cloudinary.config({ 
+cloud_name: process.env.CLOUD_NAME||'drhjbiawj', 
+api_key: process.env.CLOUD_KEY||'898193298188438',
+api_secret: process.env.CLOUD_SECRET||'OS8XrVqZAZ8daS5elrpA_uvGKMY'
+});
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public')
@@ -70,18 +75,20 @@ router.put('/editPic',  passport.authenticate('pass', {
     session: false
 }),upload.single('image'), (req, res) => {
     console.log('/editpic')
+    let path = req.file.path
     console.log(req.user.infoma.proimage)
-    try{
-        req.user.infoma.proimage = req.file.filename
-        if(req.user.infoma.proimage != ""){
-            fs.unlinkSync('@/public/'+ req.user.infoma.proimage)
-        }
-    }
-    catch{
+    stream = cloudinary.uploader.upload_stream(function(result) {
+        // console.log(result);  
+        let timage = result.secure_url
+        console.log("timage "+timage)
+        
+        console.log('nimage '+timage)
+        req.user.infoma.proimage = timage
+        req.user.save()
         res.send({success:true})
-    }  
-    req.user.save()
-    res.send({success:true})
+    }, { public_id: req.body.title });
+    fs.createReadStream(path).pipe(stream)     
+    
 }),
 
 router.put('/list',passport.authenticate('pass',{

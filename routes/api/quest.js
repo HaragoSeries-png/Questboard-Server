@@ -5,9 +5,11 @@ const mongodb = require('mongodb'),
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
 const router = express.Router();
+const writable= require('writable')
 var fs = require('fs');
 
-// var cloudinary = require('cloudinary');
+var cloudinary = require('cloudinary');
+const { Stream } = require('stream');
 var Ql
 const Qc = Quest.watch()
 Qc.on('change',change=> { 
@@ -16,14 +18,16 @@ Qc.on('change',change=> {
   Ql =  ql
 })
 
-// cloudinary.config({ 
-//   cloud_name: process.env.CLOUD_NAME, 
-//   api_key: process.env.CLOUD_KEY,
-//   api_secret: process.env.CLOUD_SECRET
-// });
+
+cloudinary.config({ 
+  cloud_name: process.env.CLOUD_NAME||'drhjbiawj', 
+  api_key: process.env.CLOUD_KEY||'898193298188438',
+  api_secret: process.env.CLOUD_SECRET||'OS8XrVqZAZ8daS5elrpA_uvGKMY'
+});
 
 
 
+// writable.setDefaultEncoding( 'UTF8' ) 
   
 multer = require('multer'),
 bodyParser = require('body-parser'),
@@ -49,7 +53,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limit: 500000,
+  limit: 50000,
   fileFilter: fileFilter
 });
 
@@ -170,36 +174,50 @@ router.post('/',  passport.authenticate('pass', {
   else{
     filename='default.png'
   }
-  
-  let newquest = {
-    helper: req.user.fistname,
-    helperID: req.user._id,
-    questname: req.body.questname,
-    category: req.body.category,
-    questdetail: req.body.questdetail,
-    reward: req.body.reward,
-    status: "pending",       //original is pending
-    image: filename,
-    date: dateFormat(new Date(), "longDate"),
-    rdate: Date.now(),
-    duedate: req.body.duedate,
-    numberofcon: req.body.numberofcon,
-    wait: [],
-    contributor:[],
-    rate:0
-  }
+  var timage = 'default.png'
+  let path = req.file.path
 
-  Quest.create(newquest).then((quest, err) => {
-    if (err) {
-      console.log("err " + err)
-      return res.send({ success: false })
+  // console.log('path '+path+' '+ typeof path)
+  stream = cloudinary.uploader.upload_stream(function(result) {
+    // console.log(result);  
+    timage = result.secure_url
+    console.log("timage "+timage)
+    
+    console.log('nimage '+timage)
+    let newquest = {
+      helper: req.user.fistname,
+      helperID: req.user._id,
+      questname: req.body.questname,
+      category: req.body.category,
+      questdetail: req.body.questdetail,
+      reward: req.body.reward,
+      status: "pending",       //original is pending
+      image: timage,
+      date: dateFormat(new Date(), "longDate"),
+      rdate: Date.now(),
+      duedate: req.body.duedate,
+      numberofcon: req.body.numberofcon,
+      wait: [],
+      contributor:[],
+      rate:0
     }
-    req.user.ownquests.push(quest)
-    console.log(req.user.quests)
-   
-    req.user.save()
-    return res.send({ success: true, questid: quest._id })
-  })
+    console.log(newquest)
+    Quest.create(newquest).then((quest, err) => {
+      if (err) {
+        console.log("err " + err)
+        return res.send({ success: false })
+      }
+      req.user.ownquests.push(quest)
+      console.log(req.user.quests)
+     
+      req.user.save()
+      console.log(quest)
+      return res.send({ success: true, questid: quest._id })
+    })
+  }, 
+  { public_id: req.body.title });
+  fs.createReadStream(path).pipe(stream)
+  
 })
 
 router.put('/accept', passport.authenticate('pass', {
@@ -301,20 +319,39 @@ router.put('/start',function(req,res){
     res.send({success:true})
   })
 })
-// router.get('/pp', function(req, res) {
-//   res.send('<form method="post" enctype="multipart/form-data">'
-//     + '<p>Public ID: <input type="text" name="title"/></p>'
-//     + '<p>Image: <input type="file" name="image"/></p>'
-//     + '<p><input type="submit" value="Upload"/></p>'
-//     + '</form>');
-// });
-// router.post('/pp', function(req, res, next) {
-//   stream = cloudinary.uploader.upload_stream(function(result) {
-//     console.log("result "+result);
-//     res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
-//              cloudinary.image(result.public_id, { format: "png", width: 100, height: 130, crop: "fill" }));
-//   }, { public_id: req.body.title } );
-//   fs.createReadStream(req.files.image.path, {encoding: 'binary'}).on('data', stream.write).on('end', stream.end);
-// });
+router.get('/pp', function(req, res) {
+  res.send('<form method="post" enctype="multipart/form-data">'
+    + '<p>Public ID: <input type="text" name="title"/></p>'
+    + '<p>Image: <input type="file" name="image"/></p>'
+    + '<p><input type="submit" value="Upload"/></p>'
+    + '</form>');
+});
+
+router.post('/pp',upload.single('image'), function(req, res,next) { 
+  let path = req.file.path
+  console.log('path '+path+' '+ typeof path)
+  stream = cloudinary.uploader.upload_stream(function(result) {
+    console.log(result);
+    res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
+    cloudinary.image(result.public_id));
+  }, 
+  { public_id: req.body.title });
+  fs.createReadStream(path).pipe(stream)
+});
+
+router.post('/ppp',upload.single('image'), function (req, res) {
+  let filename = ''
+  let des = ''
+  if(req.file!=null){
+    console.log(req.file.path)
+    filename=req.file.filename
+    des = req.file.destination
+  }
+  else{
+    filename='default.png'
+  }
+  return res.send({filename:filename,destination:des})
+  
+})
 
 module.exports = router;
