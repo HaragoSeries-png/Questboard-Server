@@ -18,11 +18,13 @@ Qc.on('change',change=> {
   Ql =  ql
 })
 
+
 cloudinary.config({ 
   cloud_name: process.env.CLOUD_NAME||'drhjbiawj', 
   api_key: process.env.CLOUD_KEY||'898193298188438',
   api_secret: process.env.CLOUD_SECRET||'OS8XrVqZAZ8daS5elrpA_uvGKMY'
 });
+
 
 
 // writable.setDefaultEncoding( 'UTF8' ) 
