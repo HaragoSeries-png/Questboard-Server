@@ -40,6 +40,7 @@ router.get('/',passport.authenticate('pass', {
     session: false
 }),async function(req,res){
     console.log(req.query.force)
+    console.log(req.user.havenoti.length>0)
     if((req.user.havenoti.length>0)||(req.query.force=='true')){
         console.log('noti')
         let user = req.user
