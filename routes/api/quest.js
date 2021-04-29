@@ -252,13 +252,13 @@ router.put('/select', passport.authenticate('pass', {
     try {
       detail.forEach((de) => {  
         console.log(de.approve)  
-        if (de.approve) {
+        if (de.approve=='true') {
           console.log('iftrue')
           quest.wait.pull(de.cid)
           quest.contributor.push(de.cid)
           User.findById(de.cid).then(user=>{
             user.accquest.push(questid)
-            user.unreadnoti.push({message:'quest accept',quest:{quest_id:questid,questname:quest.questname}})
+            user.unreadnoti.push({message:'quest accept',quest_id:questid,questname:quest.questname,date:Date.now()})
             user.save()
           })
         }
