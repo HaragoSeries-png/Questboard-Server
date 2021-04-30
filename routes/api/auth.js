@@ -32,7 +32,15 @@ router.post('/signup', async (req, res, next) => {
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             proimage: ""
-          }
+          },
+          rating:{
+            rate:0,
+            N:0
+          },
+          notify:[],
+          unreadnoti:[],
+          ownquests:[],
+          accquest:[]
         }
         console.log(newuser)
         User.create(newuser).then(user => {

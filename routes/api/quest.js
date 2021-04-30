@@ -302,27 +302,32 @@ router.delete('/', function (req, res) {
   })
 })
 router.put('/complete',function(req,res){
+  console.log('complete')
   Quest.findById(req.body.quest_id).then(quest=>{
     quest.status= 'complete'
     quest.save()
     res.send({success:true})
   })
 })
+
 router.put('/rate', passport.authenticate('pass', {
   session: false
 }), function (req, res) { 
   console.log("test rate from back")
   let detail =req.body.detail 
+  console.log(detail)
   detail.forEach((de) => {
-    User.findById(de.conName).then(user=>{
-  
+    User.findById(de.conID).then(user=>{ 
+      console.log(user)
       user.setrating(de.conRate)
       user.save()
     })
   }); 
   return res.send({success:true})
 })
+
 router.put('/start',function(req,res){
+  console.log("start")
   Quest.findById(req.body.quest_id).then(quest=>{
     quest.status= 'inprogress'
     quest.save()
