@@ -65,7 +65,8 @@ router.get('/questid/:id', function (req, res) {
 
     User.findById(ownerID).then(async (owner) => {
       let ownerName = owner.infoma.firstname + " " + owner.infoma.lastname
-      let rim = quest.remain()
+      let rim = await quest.remain()
+      console.log(rim)
       let ownerInfo = {ID: ownerID, name: ownerName,remain:rim}     
       return res.send({quest: quest, owner: ownerInfo,success: true})
     })
@@ -244,15 +245,22 @@ router.put('/select', passport.authenticate('pass', {
   let questid = req.body.quest_id
   let contid = req.body.cid
   let approve = req.body.approve
+  var acount = 0
   let detail = contid.map((cid,i)=>{
     let tde = {cid:cid,approve:approve[i]}
+    if(approve[i]){
+      acount++;
+    }
     return tde
   })
   Quest.findById(questid).then(quest => {
+    if(quest.remain<acount){
+      return res.send({success:false,message:"over"})
+    }
     try {
       detail.forEach((de) => {  
         console.log(de.approve)  
-        if (de.approve=='true'||de.approve) {
+        if ((de.approve=='true')||(de.approve==true)) {
           console.log('iftrue')
           quest.wait.pull(de.cid)
           quest.contributor.push(de.cid)
