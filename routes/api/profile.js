@@ -158,8 +158,7 @@ router.get('/mywork',passport.authenticate('pass', {
     try {
         let questid = req.user.accquest
         console.log(questid)
-        let accquest = await Quest.find().where('_id').in(questid).exec();
-        
+        let accquest = await Quest.find().where('_id').in(questid).exec();       
         console.log('acc '+accquest)
         return res.json({
             success:true,

@@ -101,7 +101,9 @@ UserSchema.methods.isValidPassword = async function (password) {
     
 // }
 UserSchema.methods.setrating = async function(newrate){
-    let rating = this.rating;
+ 
+    let rating= this.rating;
+    console.log(this.rating)
     let frag = (rating.rate*rating.N)+newrate
     let off =  rating.N+1
     let newrating = frag/off

@@ -65,7 +65,8 @@ router.get('/questid/:id', function (req, res) {
 
     User.findById(ownerID).then(async (owner) => {
       let ownerName = owner.infoma.firstname + " " + owner.infoma.lastname
-      let rim = quest.remain()
+      let rim = await quest.remain()
+      console.log(rim)
       let ownerInfo = {ID: ownerID, name: ownerName,remain:rim}     
       return res.send({quest: quest, owner: ownerInfo,success: true})
     })
@@ -244,26 +245,35 @@ router.put('/select', passport.authenticate('pass', {
   let questid = req.body.quest_id
   let contid = req.body.cid
   let approve = req.body.approve
+  var acount = 0
   let detail = contid.map((cid,i)=>{
     let tde = {cid:cid,approve:approve[i]}
+    if(approve[i]){
+      acount++;
+    }
     return tde
   })
   Quest.findById(questid).then(quest => {
+    if(quest.remain<acount){
+      return res.send({success:false,message:"over"})
+    }
     try {
       detail.forEach((de) => {  
         console.log(de.approve)  
-        if (de.approve=='true') {
+        if ((de.approve=='true')||(de.approve==true)) {
           console.log('iftrue')
           quest.wait.pull(de.cid)
           quest.contributor.push(de.cid)
           User.findById(de.cid).then(user=>{
             user.accquest.push(questid)
+            console.log(user.accquest)
             user.unreadnoti.push({message:'quest accept',quest_id:questid,questname:quest.questname,date:Date.now()})
             user.save()
+            
           })
         }
         quest.save()
-        
+        return res.send({success:true})
       }); 
     } catch (error) {
       return res.send({success:false})
@@ -292,27 +302,32 @@ router.delete('/', function (req, res) {
   })
 })
 router.put('/complete',function(req,res){
+  console.log('complete')
   Quest.findById(req.body.quest_id).then(quest=>{
     quest.status= 'complete'
     quest.save()
     res.send({success:true})
   })
 })
+
 router.put('/rate', passport.authenticate('pass', {
   session: false
 }), function (req, res) { 
   console.log("test rate from back")
   let detail =req.body.detail 
+  console.log(detail)
   detail.forEach((de) => {
-    User.findById(de.conName).then(user=>{
-  
+    User.findById(de.conID).then(user=>{ 
+      console.log(user)
       user.setrating(de.conRate)
       user.save()
     })
   }); 
   return res.send({success:true})
 })
+
 router.put('/start',function(req,res){
+  console.log("start")
   Quest.findById(req.body.quest_id).then(quest=>{
     quest.status= 'inprogress'
     quest.save()
