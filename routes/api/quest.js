@@ -169,16 +169,54 @@ router.post('/',  passport.authenticate('pass', {
   session: false
 }),upload.single('image'), function (req, res) {
   let filename = ''
+  let path = null
   if(req.file!=null){
     filename=req.file.filename
+    path = req.file.path
   }
   else{
     filename='default.png'
   }
   var timage = 'default.png'
-  let path = req.file.path
+  
 
   // console.log('path '+path+' '+ typeof path)
+  if(path==null){
+    console.log("timage "+timage)
+    
+    console.log('nimage '+timage)
+    let newquest = {
+      helper: req.user.fistname,
+      helperID: req.user._id,
+      questname: req.body.questname,
+      category: req.body.category,
+      questdetail: req.body.questdetail,
+      reward: req.body.reward,
+      status: "pending",       //original is pending
+      image: timage,
+      date: dateFormat(new Date(), "longDate"),
+      rdate: Date.now(),
+      duedate: req.body.duedate,
+      numberofcon: req.body.numberofcon,
+      wait: [],
+      contributor:[],
+      rate:0
+    }
+    console.log(newquest)
+    Quest.create(newquest).then((quest, err) => {
+      if (err) {
+        console.log("err " + err)
+        return res.send({ success: false })
+      }
+      req.user.ownquests.push(quest)
+      console.log(req.user.quests)
+     
+      req.user.save()
+      console.log(quest)
+      
+    })
+    return res.send({ success: true})
+  }
   stream = cloudinary.uploader.upload_stream(function(result) {
     // console.log(result);  
     timage = result.secure_url
