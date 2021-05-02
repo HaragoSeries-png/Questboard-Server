@@ -5,6 +5,7 @@ const mongodb = require('mongodb'),
       passport = require('passport');
       require('../../configs/passport'),
       User = require('../../models/user.model'),
+      Adminlog = require('../../models/log.model'),
       multer = require('multer'),
       fs = require('fs')
       bodyParser = require('body-parser').json(),
@@ -192,6 +193,12 @@ router.delete('/',passport.authenticate('pass', {
             return res.send({error:err})
         }
         return res.end()
+    })
+})
+router.post('/contact',function(req,res){
+    newdata = {message:req.body.message,sender:req.body.email}
+    Adminlog.create(newdata).then(q=>{
+      res.status(200)
     })
 })
 
