@@ -269,10 +269,11 @@ router.put('/accept', passport.authenticate('pass', {
   Quest.findById(questid).then(quest => {
     console.log(quest)
     quest.wait.push(adventurer)
-  
+    req.user.accquest.push(quest._id)  
+    req.user.save()
     quest.save()
-    return res.json({success:true})
   })
+  req.user.accquest.push()
 })
 
 
@@ -303,11 +304,8 @@ router.put('/select', passport.authenticate('pass', {
           quest.wait.pull(de.cid)
           quest.contributor.push(de.cid)
           User.findById(de.cid).then(user=>{
-            user.accquest.push(questid)
-            console.log(user.accquest)
             user.unreadnoti.push({message:'quest accept',quest_id:questid,questname:quest.questname,date:Date.now()})
-            user.save()
-            
+            user.save()           
           })
         }
         quest.save()
@@ -380,16 +378,10 @@ router.get('/pp', function(req, res) {
     + '</form>');
 });
 
-router.post('/pp',upload.single('image'), function(req, res,next) { 
-  let path = req.file.path
-  console.log('path '+path+' '+ typeof path)
-  stream = cloudinary.uploader.upload_stream(function(result) {
-    console.log(result);
-    res.send('Done:<br/> <img src="' + result.url + '"/><br/>' +
-    cloudinary.image(result.public_id));
-  }, 
-  { public_id: req.body.title });
-  fs.createReadStream(path).pipe(stream)
+router.post('/pp', function(req, res) { 
+  User.updateMany({},{$set:{appquest:''}},{multi:true},function(u){
+    return res.send(u)
+  })
 });
 
 router.post('/ppp',upload.single('image'), function (req, res) {
