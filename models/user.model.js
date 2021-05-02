@@ -46,13 +46,10 @@ let UserSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Quest'
     }],
-    // comquest:[{
-    //     quest:{
-    //         type: mongoose.Schema.Types.ObjectId,
-    //         ref: 'Quest' 
-    //     },
-    //     rating:Number
-    // }]
+    appquest:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Quest'        
+    }],
     rating:{
         rate:Number,
         N:Number
