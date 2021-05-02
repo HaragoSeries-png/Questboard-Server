@@ -5,6 +5,8 @@ const mongodb = require('mongodb'),
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
 const router = express.Router();
+var lastWeek = new Date();
+lastWeek.setDate(lastWeek.getDate() -7);
 
 router.put('/decide', function (req, res) {
     let questid = req.body.quest_id
@@ -67,19 +69,51 @@ router.get('/dash',function(req,res){
   })
 })
 router.get('/wee',function(req,res){
+  console.log(lastWeek)
   Quest.aggregate([
+    
     {
-        $match: {
-            timeStamp: {$gt: ISODate(startDate)},
-        }
-    },
-    {
-        $group: {
-            _id: {$week: '$timeStamp'},
-            documentCount: {$sum: 1}
-        }
-    }
-]).then(function(q){
+      $project: {
+          createdAt: {
+              $dateToString: {
+                  format: "%Y-%m-%d",
+                  date: "$createdAt"
+              }
+          },
+          author: 1,
+          comment: 1
+
+      }
+  },
+
+  // Stage 2
+  {
+      $group: {
+          _id: {
+              createdAt: '$createdAt'
+          },
+          qcount: {
+              $sum: 1
+          }
+      }
+  },
+
+  // Stage 3
+  {
+      $project: {
+          createdAt: '$_id.createdAt',
+          qcount: '$qcount',
+          _id: 0
+      }
+  }
+    
+
+]).sort('createdAt').then(function(q){
+    res.send(q)
+  })
+})
+router.get('/group',function(req,res){
+  Quest.aggregate([{$unwind: "$status"},{$group:{_id:"$status",count:{$sum:1}}}]).sort('_id').then(function(q){
     res.send(q)
   })
 })
