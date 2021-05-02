@@ -112,6 +112,11 @@ router.get('/wee',function(req,res){
     res.send(q)
   })
 })
+router.get('/group',function(req,res){
+  Quest.aggregate([{$unwind: "$status"},{$group:{_id:"$status",count:{$sum:1}}}]).sort('_id').then(function(q){
+    res.send(q)
+  })
+})
 
 
 module.exports = router
