@@ -4,6 +4,7 @@ const mongodb = require('mongodb'),
   fs = require('fs')
 const Quest = require('../../models/quest.model');
 const User = require('../../models/user.model');
+const Adminlog = require('../../models/log.model')
 const router = express.Router();
 var lastWeek = new Date();
 lastWeek.setDate(lastWeek.getDate() -7);
@@ -117,6 +118,16 @@ router.get('/group',function(req,res){
     res.send(q)
   })
 })
-
+router.post('/contact',function(req,res){
+  newdata = {message:req.body.message,sender:req.body.email}
+  Adminlog.create(newdata).then(q=>{
+    res.status(200)
+  })
+})
+router.get('/contact',function(req,res){
+  Adminlog.find({}).then(log=>{
+    res.send({log:log})
+  })
+})
 
 module.exports = router
