@@ -274,6 +274,7 @@ router.put('/accept', passport.authenticate('pass', {
     quest.save()
   })
   req.user.accquest.push()
+  res.send({success:true})
 })
 
 
