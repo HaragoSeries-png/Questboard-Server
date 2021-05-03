@@ -277,46 +277,44 @@ router.put('/accept', passport.authenticate('pass', {
 })
 
 
-router.put('/select', passport.authenticate('pass', {
-  session: false
-}), function (req, res) {
+router.put('/select', async  function (req, res) {
   
   let questid = req.body.quest_id
   let contid = req.body.cid
   let approve = req.body.approve
-  var acount = 0
   let detail = contid.map((cid,i)=>{
     let tde = {cid:cid,approve:approve[i]}
-    if(approve[i]){
-      acount++;
-    }
+    console.log(tde)
     return tde
   })
-  Quest.findById(questid).then(quest => {
-    if(quest.remain<acount){
-      return res.send({success:false,message:"over"})
+  console.log(questid)
+  const quest = await  Quest.findById(questid).then(quest=>{return quest})
+  // console.log(quest)
+  //   try {
+  detail.forEach((de) => {  
+  
+    if ((de.approve=='true')||(de.approve==true)) {
+      console.log('de '+de)
+      console.log('ap '+de.approve)
+      console.log('cid '+de.cid)
+      quest.wait.pull(de.cid)
+      quest.contributor.push(de.cid)
+      User.findById(de.cid).then(user=>{
+        console.log(user._id)
+        user.unreadnoti.push({message:'quest accept',quest_id:questid,questname:quest.questname,date:Date.now()})
+        user.save()           
+      })
+      console.log('-----------------------------------------')
     }
-    try {
-      detail.forEach((de) => {  
-        console.log(de.approve)  
-        if ((de.approve=='true')||(de.approve==true)) {
-          console.log('iftrue')
-          quest.wait.pull(de.cid)
-          quest.contributor.push(de.cid)
-          User.findById(de.cid).then(user=>{
-            user.unreadnoti.push({message:'quest accept',quest_id:questid,questname:quest.questname,date:Date.now()})
-            user.save()           
-          })
-        }
-        quest.save()
-        return res.send({success:true})
-      }); 
-    } catch (error) {
-      return res.send({success:false})
-    }
+      
+      
+  }); 
+  quest.save()
     
-    return res.send({success:true})
-  })  
+    
+// return res.send({success:true})
+  
+  return res.send({success:true})
 })
 
 router.get('/test', function (req, res) {
