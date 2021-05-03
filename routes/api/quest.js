@@ -273,7 +273,6 @@ router.put('/accept', passport.authenticate('pass', {
     req.user.save()
     quest.save()
   })
-  req.user.accquest.push()
   res.send({success:true})
 })
 
@@ -367,9 +366,17 @@ router.put('/start',function(req,res){
   console.log("start")
   Quest.findById(req.body.quest_id).then(quest=>{
     quest.status= 'inprogress'
+    if(quest.wait.length){
+      let accquest = await User.find().where('_id').in(quest.wait).exec();
+    accquest.forEach(u=>{
+      u.accquest.pull(req.body.quest_id)
+      u.save()
+     })
+    }    
     quest.save()
     res.send({success:true})
   })
+  
 })
 router.get('/pp', function(req, res) {
   res.send('<form method="post" enctype="multipart/form-data">'
