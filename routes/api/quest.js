@@ -360,15 +360,26 @@ router.put('/rate', passport.authenticate('pass', {
   return res.send({success:true})
 })
 
-router.put('/start',function(req,res){
+router.put('/start',async function(req,res){
   console.log("start")
-  Quest.findById(req.body.quest_id).then(quest=>{
-    quest.status= 'inprogress'
-      
-    quest.save()
-    res.send({success:true})
+  let qid =req.body.quest_id
+  const quest = await Quest.findById(qid).then(q=>{ 
+    q.status = 'inprogress'
+    q.save()  
+    console.log(q)
+    return q
   })
   
+  let lid = quest.wait
+  
+  User.find().where('_id').in(lid).exec((err, records) => {
+    records.forEach(r=>{
+      r.accquest.pull(qid)
+      r.save()
+  })}
+  );
+  
+  res.send({success:true})
 })
 router.get('/pp', function(req, res) {
   res.send('<form method="post" enctype="multipart/form-data">'
